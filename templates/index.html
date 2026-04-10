@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Doctor Appointment</h2>
+
+<input id="name" placeholder="Name"><br>
+<input id="phone" placeholder="Phone"><br>
+<button onclick="sendOtp()">Send OTP</button><br>
+
+<input id="otp" placeholder="OTP"><br>
+<button onclick="verify()">Verify</button>
+
+<h3>Slots</h3>
+<div id="slots"></div>
+
+<script>
+function sendOtp(){
+    fetch('/send-otp', {
+        method:'POST',
+        body:new URLSearchParams({
+            name: name.value,
+            phone: phone.value
+        })
+    })
+}
+
+function verify(){
+    fetch('/verify', {
+        method:'POST',
+        body:new URLSearchParams({
+            name: name.value,
+            phone: phone.value,
+            otp: otp.value
+        })
+    }).then(loadSlots)
+}
+
+function loadSlots(){
+    fetch('/slots')
+    .then(res=>res.json())
+    .then(data=>{
+        let html = ""
+        data.forEach(s=>{
+            html += `<button onclick="book(${s.id})">${s.time}</button>`
+        })
+        slots.innerHTML = html
+    })
+}
+
+function book(id){
+    fetch('/book', {
+        method:'POST',
+        body:new URLSearchParams({
+            slot_id:id,
+            name:name.value,
+            phone:phone.value
+        })
+    }).then(()=>alert("Booked"))
+}
+</script>
+
+</body>
+</html>
